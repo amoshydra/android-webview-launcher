@@ -1,3 +1,9 @@
 <resources>
-    <string name="app_name">Android App</string>
+    <string name="app_name">WebView Launcher</string>
+    <string name="app_title">WebView Launcher</string>
+    <string name="url_label">Website URL</string>
+    <string name="url_hint">https://example.com</string>
+    <string name="js_label">JavaScript Code (runs 2 seconds after page loads)</string>
+    <string name="js_hint">alert(\'Hello from JavaScript!\');</string>
+    <string name="launch_button">Launch WebView</string>
 </resources>
