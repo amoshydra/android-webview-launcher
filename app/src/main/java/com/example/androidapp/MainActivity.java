@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
         webView = findViewById(R.id.webview);
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
+        webSettings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
         
         webView.setWebViewClient(new WebViewClient() {
             @Override
