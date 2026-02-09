@@ -1,6 +1,7 @@
 package com.example.androidapp;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -33,6 +34,9 @@ public class MainActivity extends AppCompatActivity {
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+
+        int cacheMode = getCacheModeFromPreferences();
+        webSettings.setCacheMode(cacheMode);
         
         webView.setWebViewClient(new WebViewClient() {
             @Override
@@ -47,6 +51,11 @@ public class MainActivity extends AppCompatActivity {
         });
 
         webView.loadUrl(url != null ? url : "https://example.com");
+    }
+
+    private int getCacheModeFromPreferences() {
+        SharedPreferences prefs = getSharedPreferences("WebViewPreferences", MODE_PRIVATE);
+        return prefs.getInt("cache_mode", WebSettings.LOAD_DEFAULT);
     }
 
     @Override

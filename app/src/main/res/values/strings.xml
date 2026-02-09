@@ -6,4 +6,9 @@
     <string name="js_label">JavaScript Code (runs 2 seconds after page loads)</string>
     <string name="js_hint">alert(\'Hello from JavaScript!\');</string>
     <string name="launch_button">Launch WebView</string>
+    <string name="cache_label">Cache Mode</string>
+    <string name="cache_default_desc">Use Default Cache (Use default cache behavior)</string>
+    <string name="cache_no_cache_desc">No Cache (Bypass cache, load from network)</string>
+    <string name="cache_only_desc">Cache Only (Load from cache only, no network)</string>
+    <string name="cache_else_network_desc">Cache Else Network (Load from cache if available, else from network)</string>
 </resources>
