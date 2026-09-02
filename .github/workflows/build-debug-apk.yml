@@ -37,7 +37,6 @@ jobs:
   release:
     needs: build
     runs-on: ubuntu-latest
-    if: "startsWith(github.event.head_commit.message, 'ci: build')"
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
