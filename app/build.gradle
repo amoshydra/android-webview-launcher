@@ -2,6 +2,13 @@ plugins {
     id 'com.android.application'
 }
 
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file('keystore.properties')
+def hasReleaseKeystore = keystorePropertiesFile.exists()
+if (hasReleaseKeystore) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
 android {
     namespace 'com.example.androidapp'
     compileSdk 33
@@ -14,9 +21,21 @@ android {
         versionName "1.0"
     }
 
+    signingConfigs {
+        release {
+            if (hasReleaseKeystore) {
+                storeFile rootProject.file(keystoreProperties['storeFile'])
+                storePassword keystoreProperties['storePassword']
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+            }
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
+            signingConfig hasReleaseKeystore ? signingConfigs.release : null
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }

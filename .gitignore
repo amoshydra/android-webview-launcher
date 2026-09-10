@@ -1,2 +1,6 @@
 .gradle
 app/build
+
+# Release signing (local demo keystore — never commit)
+keystore.properties
+*.keystore

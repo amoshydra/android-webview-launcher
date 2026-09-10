@@ -1,4 +1,4 @@
-name: Build Debug APK
+name: Build Android APKs
 
 on:
   push:
@@ -24,14 +24,30 @@ jobs:
       - name: Cache Gradle
         uses: gradle/gradle-build-action@v2
 
-      - name: Build Debug APK
-        run: ./gradlew assembleDebug
+      - name: Configure release signing (from secrets)
+        if: ${{ secrets.KEYSTORE_BASE64 != '' }}
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_STORE_PASSWORD: ${{ secrets.KEYSTORE_STORE_PASSWORD }}
+          KEYSTORE_KEY_ALIAS: ${{ secrets.KEYSTORE_KEY_ALIAS }}
+          KEYSTORE_KEY_PASSWORD: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
+        run: |
+          echo "$KEYSTORE_BASE64" | base64 -d > release.keystore
+          echo "storeFile=release.keystore" > keystore.properties
+          echo "storePassword=$KEYSTORE_STORE_PASSWORD" >> keystore.properties
+          echo "keyAlias=$KEYSTORE_KEY_ALIAS" >> keystore.properties
+          echo "keyPassword=$KEYSTORE_KEY_PASSWORD" >> keystore.properties
 
-      - name: Upload APK
+      - name: Build Debug + Release APKs
+        run: ./gradlew assembleDebug assembleRelease
+
+      - name: Upload APKs
         uses: actions/upload-artifact@v4
         with:
-          name: debug-apk
-          path: app/build/outputs/apk/debug/app-debug.apk
+          name: apks
+          path: |
+            app/build/outputs/apk/debug/app-debug.apk
+            app/build/outputs/apk/release/app-release*.apk
           retention-days: 30
 
   release:
@@ -43,10 +59,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Download APK
+      - name: Download APKs
         uses: actions/download-artifact@v4
         with:
-          name: debug-apk
+          name: apks
           path: ./apk
 
       - name: Get timestamp
@@ -62,7 +78,9 @@ jobs:
             Automated build from commit: ${{ github.event.head_commit.message }}
             Build Date: ${{ steps.timestamp.outputs.timestamp }}
             Commit: ${{ github.sha }}
-          files: ./apk/app-debug.apk
+          files: |
+            ./apk/app-debug.apk
+            ./apk/app-release*.apk
           prerelease: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
