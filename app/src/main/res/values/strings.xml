@@ -2,13 +2,18 @@
     <string name="app_name">WebView Launcher</string>
     <string name="app_title">WebView Launcher</string>
     <string name="url_label">Website URL</string>
-    <string name="url_hint">https://example.com</string>
-    <string name="js_label">JavaScript Code (runs 2 seconds after page loads)</string>
-    <string name="js_hint">alert(\'Hello from JavaScript!\');</string>
+    <string name="url_hint">e.g. https://example.com (required)</string>
+    <string name="js_label">JavaScript Code (optional)</string>
+    <string name="js_hint">Runs 2 seconds after the page loads. Example: alert(\'Hello from JavaScript!\');</string>
     <string name="launch_button">Launch WebView</string>
     <string name="cache_label">Cache Mode</string>
     <string name="cache_default_desc">Use Default Cache (Use default cache behavior)</string>
     <string name="cache_no_cache_desc">No Cache (Bypass cache, load from network)</string>
     <string name="cache_only_desc">Cache Only (Load from cache only, no network)</string>
     <string name="cache_else_network_desc">Cache Else Network (Load from cache if available, else from network)</string>
+    <string name="cache_quota_label">Cache Quota (bytes, optional)</string>
+    <string name="cache_quota_hint">e.g. 5242880 (= 5 MB). Leave empty to keep the current quota.</string>
+    <string name="cache_status_label">Cache Status</string>
+    <string name="query_button">Query Cache</string>
+    <string name="cache_indicator_default">Press "Query Cache" to measure usage and quota.</string>
 </resources>

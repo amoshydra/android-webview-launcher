@@ -2,16 +2,22 @@ package com.example.androidapp;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.webkit.WebSettings;
+import android.webkit.WebStorage;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class SettingsActivity extends AppCompatActivity {
     private EditText urlInput;
     private EditText jsInput;
+    private EditText cacheQuotaInput;
+    private TextView cacheIndicator;
+    private Button queryCacheButton;
     private Button launchButton;
     private RadioGroup cacheRadioGroup;
 
@@ -22,11 +28,11 @@ public class SettingsActivity extends AppCompatActivity {
 
         urlInput = findViewById(R.id.url_input);
         jsInput = findViewById(R.id.js_input);
+        cacheQuotaInput = findViewById(R.id.cache_quota_input);
+        cacheIndicator = findViewById(R.id.cache_indicator);
+        queryCacheButton = findViewById(R.id.query_cache_button);
         launchButton = findViewById(R.id.launch_button);
         cacheRadioGroup = findViewById(R.id.cache_radio_group);
-
-        urlInput.setText("https://example.com");
-        jsInput.setText("alert('Hello from JavaScript!');");
 
         // Load saved cache preference
         SharedPreferences prefs = getSharedPreferences("WebViewPreferences", MODE_PRIVATE);
@@ -46,8 +52,13 @@ public class SettingsActivity extends AppCompatActivity {
                 cacheRadioGroup.check(R.id.cache_default);
         }
 
+        queryCacheButton.setOnClickListener(v -> {
+            String url = resolveUrl();
+            measureCache(url);
+        });
+
         launchButton.setOnClickListener(v -> {
-            String url = urlInput.getText().toString().trim();
+            String url = resolveUrl();
             String javascript = jsInput.getText().toString().trim();
             
             // Save cache preference
@@ -68,10 +79,47 @@ public class SettingsActivity extends AppCompatActivity {
             editor.putInt("cache_mode", selectedCacheMode);
             editor.apply();
 
+            measureCache(url);
+
             Intent intent = new Intent(SettingsActivity.this, MainActivity.class);
-            intent.putExtra("url", url.isEmpty() ? "https://example.com" : url);
+            intent.putExtra("url", url);
             intent.putExtra("javascript", javascript);
             startActivity(intent);
         });
+    }
+
+    private String resolveUrl() {
+        String url = urlInput.getText().toString().trim();
+        return url.isEmpty() ? "https://example.com" : url;
+    }
+
+    private void measureCache(String url) {
+        try {
+            Uri uri = Uri.parse(url);
+            if (uri.getScheme() == null || uri.getHost() == null) {
+                cacheIndicator.setText("Cannot query cache: invalid URL '" + url + "'");
+                return;
+            }
+            String origin = uri.getScheme() + "://" + uri.getHost();
+            String quotaText = cacheQuotaInput.getText().toString().trim();
+            boolean hasQuota = !quotaText.isEmpty();
+            long newQuota = hasQuota ? Long.parseLong(quotaText) : 0;
+
+            WebStorage storage = WebStorage.getInstance();
+            storage.getQuotaForOrigin(origin, quota ->
+                storage.getUsageForOrigin(origin, usage -> {
+                    String message = "Origin: " + origin + "\n"
+                            + "Usage: " + usage + " bytes\n"
+                            + "Quota: " + quota + " bytes";
+                    if (hasQuota) {
+                        storage.setQuotaForOrigin(origin, newQuota);
+                        message += "\nSet quota to " + newQuota + " bytes";
+                    }
+                    cacheIndicator.setText(message);
+                })
+            );
+        } catch (Exception e) {
+            cacheIndicator.setText("Cache query failed: " + e.getMessage());
+        }
     }
 }

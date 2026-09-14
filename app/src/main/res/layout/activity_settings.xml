@@ -54,23 +54,14 @@
         android:fontFamily="monospace"
         android:padding="12dp"
         android:background="@android:drawable/edit_text"
-        android:layout_marginBottom="32dp" />
+        android:layout_marginBottom="24dp" />
 
-    <Button
-        android:id="@+id/launch_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/launch_button"
-        android:textSize="18sp"
-        android:padding="16dp" />
-    
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/cache_label"
         android:textSize="16sp"
         android:textColor="@color/black"
-        android:layout_marginTop="24dp"
         android:layout_marginBottom="12dp" />
 
     <RadioGroup
@@ -107,5 +98,59 @@
             android:text="@string/cache_else_network_desc"
             android:padding="12dp" />
     </RadioGroup>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/cache_quota_label"
+        android:textSize="16sp"
+        android:textColor="@color/black"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="8dp" />
+
+    <EditText
+        android:id="@+id/cache_quota_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/cache_quota_hint"
+        android:inputType="number"
+        android:textSize="14sp"
+        android:padding="12dp"
+        android:background="@android:drawable/edit_text"
+        android:layout_marginBottom="16dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/cache_status_label"
+        android:textSize="16sp"
+        android:textColor="@color/black"
+        android:layout_marginBottom="8dp" />
+
+    <Button
+        android:id="@+id/query_cache_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/query_button"
+        android:textSize="16sp"
+        android:padding="12dp" />
+
+    <TextView
+        android:id="@+id/cache_indicator"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/cache_indicator_default"
+        android:textSize="14sp"
+        android:textColor="@color/black"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="24dp" />
+
+    <Button
+        android:id="@+id/launch_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/launch_button"
+        android:textSize="18sp"
+        android:padding="16dp" />
 
 </LinearLayout>
