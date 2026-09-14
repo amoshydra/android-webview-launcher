@@ -10,7 +10,12 @@ import android.view.WindowManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.webkit.HttpCache;
+import androidx.webkit.WebViewCompat;
+import androidx.webkit.WebViewFeature;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
     private WebView webView;
@@ -52,6 +57,44 @@ public class MainActivity extends AppCompatActivity {
         });
 
         webView.loadUrl(url != null ? url : "https://example.com");
+        applyCacheQuota();
+    }
+
+    private void applyCacheQuota() {
+        long quotaBytes = getIntent().getLongExtra("quota_bytes", -1);
+        if (quotaBytes <= 0) {
+            return;
+        }
+        if (!WebViewFeature.isFeatureSupported(WebViewFeature.MULTI_PROFILE)
+                || !WebViewFeature.isFeatureSupported(WebViewFeature.HTTP_CACHE_MANAGER)) {
+            Toast.makeText(this, "Cache quota API not supported on this device", Toast.LENGTH_LONG).show();
+            return;
+        }
+        try {
+            HttpCache cache = WebViewCompat.getProfile(webView).getHttpCache();
+            long before = cache.getQuotaBytes();
+            cache.setQuotaBytes(quotaBytes);
+            long after = cache.getQuotaBytes();
+            Toast.makeText(this, "Cache quota: " + formatBytes(before) + " -> " + formatBytes(after)
+                    + " (requested " + formatBytes(quotaBytes) + ")", Toast.LENGTH_LONG).show();
+        } catch (Exception e) {
+            Toast.makeText(this, "Cache quota set failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private String formatBytes(long bytes) {
+        if (bytes < 1024) {
+            return bytes + " B";
+        }
+        double kb = bytes / 1024.0;
+        if (kb < 1024) {
+            return String.format(Locale.US, "%.1f KB", kb);
+        }
+        double mb = kb / 1024.0;
+        if (mb < 1024) {
+            return String.format(Locale.US, "%.2f MB", mb);
+        }
+        return String.format(Locale.US, "%.2f GB", mb / 1024.0);
     }
 
     private int getCacheModeFromPreferences() {

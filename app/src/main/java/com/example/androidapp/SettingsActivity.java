@@ -11,6 +11,8 @@ import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
+import java.io.File;
+import java.util.Locale;
 
 public class SettingsActivity extends AppCompatActivity {
     private EditText urlInput;
@@ -84,6 +86,7 @@ public class SettingsActivity extends AppCompatActivity {
             Intent intent = new Intent(SettingsActivity.this, MainActivity.class);
             intent.putExtra("url", url);
             intent.putExtra("javascript", javascript);
+            intent.putExtra("quota_bytes", getRequestedQuota());
             startActivity(intent);
         });
     }
@@ -91,6 +94,18 @@ public class SettingsActivity extends AppCompatActivity {
     private String resolveUrl() {
         String url = urlInput.getText().toString().trim();
         return url.isEmpty() ? "https://example.com" : url;
+    }
+
+    private long getRequestedQuota() {
+        String quotaText = cacheQuotaInput.getText().toString().trim();
+        if (quotaText.isEmpty()) {
+            return -1;
+        }
+        try {
+            return Long.parseLong(quotaText);
+        } catch (NumberFormatException e) {
+            return -1;
+        }
     }
 
     private void measureCache(String url) {
@@ -101,25 +116,60 @@ public class SettingsActivity extends AppCompatActivity {
                 return;
             }
             String origin = uri.getScheme() + "://" + uri.getHost();
-            String quotaText = cacheQuotaInput.getText().toString().trim();
-            boolean hasQuota = !quotaText.isEmpty();
-            long newQuota = hasQuota ? Long.parseLong(quotaText) : 0;
+            long requestedQuota = getRequestedQuota();
+            long httpCacheBytes = directorySize(getCacheDir());
 
             WebStorage storage = WebStorage.getInstance();
-            storage.getQuotaForOrigin(origin, quota ->
-                storage.getUsageForOrigin(origin, usage -> {
-                    String message = "Origin: " + origin + "\n"
-                            + "Usage: " + usage + " bytes\n"
-                            + "Quota: " + quota + " bytes";
-                    if (hasQuota) {
-                        storage.setQuotaForOrigin(origin, newQuota);
-                        message += "\nSet quota to " + newQuota + " bytes";
+            storage.getUsageForOrigin(origin, usage ->
+                storage.getQuotaForOrigin(origin, quota -> {
+                    StringBuilder message = new StringBuilder()
+                            .append("Origin: ").append(origin).append('\n')
+                            .append("WebStorage usage: ").append(formatBytes(usage)).append('\n')
+                            .append("Quota (legacy, not enforced): ").append(formatBytes(quota)).append('\n')
+                            .append("HTTP cache on disk: ").append(formatBytes(httpCacheBytes));
+                    if (requestedQuota > 0) {
+                        message.append("\nQuota request: ").append(formatBytes(requestedQuota))
+                                .append(" (applied inside the WebView)");
                     }
-                    cacheIndicator.setText(message);
+                    cacheIndicator.setText(message.toString());
                 })
             );
         } catch (Exception e) {
             cacheIndicator.setText("Cache query failed: " + e.getMessage());
         }
+    }
+
+    private String formatBytes(long bytes) {
+        if (bytes < 1024) {
+            return bytes + " B";
+        }
+        double kb = bytes / 1024.0;
+        if (kb < 1024) {
+            return String.format(Locale.US, "%.1f KB", kb);
+        }
+        double mb = kb / 1024.0;
+        if (mb < 1024) {
+            return String.format(Locale.US, "%.2f MB", mb);
+        }
+        return String.format(Locale.US, "%.2f GB", mb / 1024.0);
+    }
+
+    private long directorySize(File dir) {
+        if (dir == null || !dir.exists()) {
+            return 0;
+        }
+        File[] files = dir.listFiles();
+        if (files == null) {
+            return 0;
+        }
+        long total = 0;
+        for (File file : files) {
+            if (file.isDirectory()) {
+                total += directorySize(file);
+            } else {
+                total += file.length();
+            }
+        }
+        return total;
     }
 }
