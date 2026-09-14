@@ -67,6 +67,12 @@ jobs:
           name: apks
           path: ./apk
 
+      - name: Flatten APKs
+        run: |
+          mkdir -p ./flat
+          find ./apk -name '*.apk' -exec cp {} ./flat/ \;
+          ls -la ./flat
+
       - name: Get timestamp
         id: timestamp
         run: echo "timestamp=$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_OUTPUT
@@ -80,9 +86,7 @@ jobs:
             Automated build from commit: ${{ github.event.head_commit.message }}
             Build Date: ${{ steps.timestamp.outputs.timestamp }}
             Commit: ${{ github.sha }}
-          files: |
-            ./apk/app/build/outputs/apk/debug/app-debug.apk
-            ./apk/app/build/outputs/apk/release/*.apk
+          files: ./flat/*.apk
           prerelease: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
