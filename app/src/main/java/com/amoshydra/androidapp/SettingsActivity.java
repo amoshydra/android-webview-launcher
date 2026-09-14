@@ -2,6 +2,7 @@ package com.amoshydra.androidapp;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.webkit.WebSettings;
@@ -11,6 +12,11 @@ import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.webkit.HttpCache;
+import androidx.webkit.Profile;
+import androidx.webkit.ProfileStore;
+import androidx.webkit.WebViewCompat;
+import androidx.webkit.WebViewFeature;
 import java.io.File;
 import java.util.Locale;
 
@@ -19,6 +25,7 @@ public class SettingsActivity extends AppCompatActivity {
     private EditText jsInput;
     private EditText cacheQuotaInput;
     private TextView cacheIndicator;
+    private TextView webviewInfo;
     private Button queryCacheButton;
     private Button launchButton;
     private RadioGroup cacheRadioGroup;
@@ -32,9 +39,12 @@ public class SettingsActivity extends AppCompatActivity {
         jsInput = findViewById(R.id.js_input);
         cacheQuotaInput = findViewById(R.id.cache_quota_input);
         cacheIndicator = findViewById(R.id.cache_indicator);
+        webviewInfo = findViewById(R.id.webview_info);
         queryCacheButton = findViewById(R.id.query_cache_button);
         launchButton = findViewById(R.id.launch_button);
         cacheRadioGroup = findViewById(R.id.cache_radio_group);
+
+        showWebViewInfo();
 
         // Load saved cache preference
         SharedPreferences prefs = getSharedPreferences("WebViewPreferences", MODE_PRIVATE);
@@ -118,12 +128,14 @@ public class SettingsActivity extends AppCompatActivity {
             String origin = uri.getScheme() + "://" + uri.getHost();
             long requestedQuota = getRequestedQuota();
             long cacheDirBytes = directorySize(getCacheDir());
+            String quotaLine = readHttpCacheQuota();
 
             WebStorage.getInstance().getUsageForOrigin(origin, usage -> {
                 StringBuilder message = new StringBuilder()
                         .append("Origin: ").append(origin).append('\n')
                         .append("WebStorage usage: ").append(formatBytes(usage)).append('\n')
-                        .append("App cache dir: ").append(formatBytes(cacheDirBytes));
+                        .append("App cache dir: ").append(formatBytes(cacheDirBytes)).append('\n')
+                        .append(quotaLine);
                 if (requestedQuota >= 0) {
                     message.append("\nQuota request: ").append(formatBytes(requestedQuota))
                             .append(" (enforced by WebView; result shown after launch)");
@@ -132,6 +144,47 @@ public class SettingsActivity extends AppCompatActivity {
             });
         } catch (Exception e) {
             cacheIndicator.setText("Cache query failed: " + e.getMessage());
+        }
+    }
+
+    private boolean isQuotaSupported() {
+        return WebViewFeature.isFeatureSupported(WebViewFeature.MULTI_PROFILE)
+                && WebViewFeature.isFeatureSupported(WebViewFeature.HTTP_CACHE_MANAGER);
+    }
+
+    private void showWebViewInfo() {
+        PackageInfo pkg = WebViewCompat.getCurrentWebViewPackage(this);
+        String version = (pkg != null && pkg.versionName != null) ? pkg.versionName : "unknown";
+        int major = 0;
+        try {
+            major = Integer.parseInt(version.split("\\.")[0]);
+        } catch (NumberFormatException ignored) {
+        }
+        boolean supported = isQuotaSupported();
+
+        webviewInfo.setText("WebView " + version + (major > 0 ? " (M" + major + ")" : "")
+                + "\nHTTP cache quota: " + (supported ? "supported" : "not supported (needs M151+)"));
+
+        cacheQuotaInput.setEnabled(supported);
+        if (!supported) {
+            cacheQuotaInput.setText("");
+            cacheQuotaInput.setHint("Unavailable: needs WebView M151+"
+                    + (major > 0 ? ", this device has M" + major : ""));
+        }
+    }
+
+    private String readHttpCacheQuota() {
+        if (!isQuotaSupported()) {
+            return "HTTP cache quota: unsupported (needs WebView M151+)";
+        }
+        try {
+            HttpCache cache = ProfileStore.getInstance()
+                    .getOrCreateProfile(Profile.DEFAULT_PROFILE_NAME)
+                    .getHttpCache();
+            return "HTTP cache quota: " + formatBytes(cache.getQuotaBytes())
+                    + (cache.isUsingDefaultQuota() ? " (auto default)" : " (set)");
+        } catch (Exception e) {
+            return "HTTP cache quota: unavailable (" + e.getMessage() + ")";
         }
     }
 

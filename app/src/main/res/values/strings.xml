@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">WebView Launcher</string>
     <string name="app_title">WebView Launcher</string>
+    <string name="webview_info_default">WebView: checking…</string>
     <string name="url_label">Website URL</string>
     <string name="url_hint">e.g. https://example.com (required)</string>
     <string name="js_label">JavaScript Code (optional)</string>
