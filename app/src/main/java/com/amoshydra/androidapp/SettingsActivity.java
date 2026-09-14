@@ -117,23 +117,19 @@ public class SettingsActivity extends AppCompatActivity {
             }
             String origin = uri.getScheme() + "://" + uri.getHost();
             long requestedQuota = getRequestedQuota();
-            long httpCacheBytes = directorySize(getCacheDir());
+            long cacheDirBytes = directorySize(getCacheDir());
 
-            WebStorage storage = WebStorage.getInstance();
-            storage.getUsageForOrigin(origin, usage ->
-                storage.getQuotaForOrigin(origin, quota -> {
-                    StringBuilder message = new StringBuilder()
-                            .append("Origin: ").append(origin).append('\n')
-                            .append("WebStorage usage: ").append(formatBytes(usage)).append('\n')
-                            .append("Quota (legacy, not enforced): ").append(formatBytes(quota)).append('\n')
-                            .append("HTTP cache on disk: ").append(formatBytes(httpCacheBytes));
-                    if (requestedQuota > 0) {
-                        message.append("\nQuota request: ").append(formatBytes(requestedQuota))
-                                .append(" (applied inside the WebView)");
-                    }
-                    cacheIndicator.setText(message.toString());
-                })
-            );
+            WebStorage.getInstance().getUsageForOrigin(origin, usage -> {
+                StringBuilder message = new StringBuilder()
+                        .append("Origin: ").append(origin).append('\n')
+                        .append("WebStorage usage: ").append(formatBytes(usage)).append('\n')
+                        .append("App cache dir: ").append(formatBytes(cacheDirBytes));
+                if (requestedQuota >= 0) {
+                    message.append("\nQuota request: ").append(formatBytes(requestedQuota))
+                            .append(" (enforced by WebView; result shown after launch)");
+                }
+                cacheIndicator.setText(message.toString());
+            });
         } catch (Exception e) {
             cacheIndicator.setText("Cache query failed: " + e.getMessage());
         }

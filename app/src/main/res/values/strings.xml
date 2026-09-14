@@ -15,5 +15,5 @@
     <string name="cache_quota_hint">e.g. 5242880 (= 5 MB). Leave empty to keep the current quota.</string>
     <string name="cache_status_label">Cache Status</string>
     <string name="query_button">Query Cache</string>
-    <string name="cache_indicator_default">Press "Query Cache" to measure usage and quota.</string>
+    <string name="cache_indicator_default">Press "Query Cache" to measure WebStorage usage and app cache size.</string>
 </resources>

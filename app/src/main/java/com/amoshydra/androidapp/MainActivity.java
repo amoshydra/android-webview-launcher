@@ -56,13 +56,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        webView.loadUrl(url != null ? url : "https://example.com");
         applyCacheQuota();
+        webView.loadUrl(url != null ? url : "https://example.com");
     }
 
     private void applyCacheQuota() {
         long quotaBytes = getIntent().getLongExtra("quota_bytes", -1);
-        if (quotaBytes <= 0) {
+        if (quotaBytes < 0) {
             return;
         }
         if (!WebViewFeature.isFeatureSupported(WebViewFeature.MULTI_PROFILE)

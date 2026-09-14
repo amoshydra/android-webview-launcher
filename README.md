@@ -17,6 +17,7 @@ A fullscreen WebView launcher with JavaScript injection capabilities, built with
 - **Containerized Builds** - Build APKs using Podman (no Android Studio required)
 - **Fullscreen Experience** - Immersive browsing without UI chrome
 - **Monospace Editor** - Code-friendly JavaScript input field
+- **Cache Control** - Choose the cache mode and set the HTTP cache quota before launching (quota enforcement requires WebView M151+; applied via `androidx.webkit` `Profile.getHttpCache()`)
 
 ## Quick Start
 
