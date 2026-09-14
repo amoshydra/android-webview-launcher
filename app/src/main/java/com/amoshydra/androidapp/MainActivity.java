@@ -1,4 +1,4 @@
-package com.example.androidapp;
+package com.amoshydra.androidapp;
 
 import android.content.Intent;
 import android.content.SharedPreferences;

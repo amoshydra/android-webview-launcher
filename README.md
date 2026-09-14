@@ -76,7 +76,7 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 
 ## App Details
 
-- **Package**: `com.example.androidapp`
+- **Package**: `com.amoshydra.androidapp`
 - **Min SDK**: 26 (Android 8.0)
 - **Target SDK**: 34 (Android 14)
 - **Build System**: Gradle with Podman containerization
@@ -85,8 +85,8 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 
 Edit these files to customize the app:
 
-- `app/src/main/java/com/example/androidapp/SettingsActivity.java` - Settings form logic
-- `app/src/main/java/com/example/androidapp/MainActivity.java` - WebView and JS execution
+- `app/src/main/java/com/amoshydra/androidapp/SettingsActivity.java` - Settings form logic
+- `app/src/main/java/com/amoshydra/androidapp/MainActivity.java` - WebView and JS execution
 - `app/src/main/res/layout/activity_settings.xml` - Settings form layout
 - `app/src/main/res/layout/activity_main.xml` - WebView layout
 - `app/build.gradle` - Dependencies and build settings
@@ -133,7 +133,7 @@ MainActivity (Fullscreen WebView)
 
 **Signature mismatch on reinstall**: If you get `INSTALL_FAILED_UPDATE_INCOMPATIBLE`, uninstall first:
 ```bash
-adb uninstall com.example.androidapp
+adb uninstall com.amoshydra.androidapp
 adb install app/build/outputs/apk/debug/app-debug.apk
 ```
 
@@ -145,7 +145,7 @@ adb install app/build/outputs/apk/debug/app-debug.apk
 │   ├── build.gradle              # App-level build configuration
 │   └── src/main/
 │       ├── AndroidManifest.xml   # App manifest
-│       ├── java/com/example/androidapp/
+│       ├── java/com/amoshydra/androidapp/
 │       │   ├── MainActivity.java      # Fullscreen WebView
 │       │   └── SettingsActivity.java  # Settings form
 │       └── res/                  # Resources (layouts, strings, icons)

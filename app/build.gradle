@@ -10,11 +10,11 @@ if (hasReleaseKeystore) {
 }
 
 android {
-    namespace 'com.example.androidapp'
+    namespace 'com.amoshydra.androidapp'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.example.androidapp"
+        applicationId "com.amoshydra.androidapp"
         minSdk 26
         targetSdk 33
         versionCode 1
