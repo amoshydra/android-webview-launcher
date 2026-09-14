@@ -81,8 +81,8 @@ jobs:
             Build Date: ${{ steps.timestamp.outputs.timestamp }}
             Commit: ${{ github.sha }}
           files: |
-            ./apk/app-debug.apk
-            ./apk/app-release*.apk
+            ./apk/app/build/outputs/apk/debug/app-debug.apk
+            ./apk/app/build/outputs/apk/release/*.apk
           prerelease: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
