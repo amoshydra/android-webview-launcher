@@ -20,20 +20,39 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      # Replaces android-actions/setup-android@v3, which ends with a hardcoded
-      # `sdkmanager tools` call. The legacy "tools" package was removed from
-      # Google's repository, so that call now exits 1 and fails the step every
-      # time. Installing explicitly mirrors the Dockerfile instead.
-      # build-tools 33.0.1 is the AGP 8.1.0 default; the platform matches compileSdk.
+      # Fully self-contained SDK install, mirroring the Dockerfile. The runner's
+      # preinstalled SDK layout is not dependable across image updates (observed:
+      # cmdline-tools/16.0 with no "latest" symlink), so it is not relied on here.
       - name: Set up Android SDK
         run: |
-          echo "${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin" >> "$GITHUB_PATH"
-          echo "ANDROID_HOME=${ANDROID_SDK_ROOT}" >> "$GITHUB_ENV"
-          yes | sdkmanager --licenses > /dev/null
+          set -euo pipefail
+          echo "runner ANDROID_SDK_ROOT=${ANDROID_SDK_ROOT:-<unset>}"
+          echo "runner ANDROID_HOME=${ANDROID_HOME:-<unset>}"
+          SDK="$HOME/android-sdk"
+          mkdir -p "$SDK/cmdline-tools"
+          cd "$SDK/cmdline-tools"
+          curl -fsSL -o cmdline-tools.zip \
+            https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+          unzip -q cmdline-tools.zip
+          rm cmdline-tools.zip
+          mv cmdline-tools latest
+          # GITHUB_PATH only takes effect for *later* steps, so the current shell
+          # needs the same entries exported explicitly.
+          export ANDROID_HOME="$SDK"
+          export ANDROID_SDK_ROOT="$SDK"
+          export PATH="$SDK/cmdline-tools/latest/bin:$SDK/platform-tools:$PATH"
+          echo "ANDROID_HOME=$SDK" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK_ROOT=$SDK" >> "$GITHUB_ENV"
+          echo "$SDK/cmdline-tools/latest/bin" >> "$GITHUB_PATH"
+          echo "$SDK/platform-tools" >> "$GITHUB_PATH"
+          echo "sdk.dir=$SDK" > "$GITHUB_WORKSPACE/local.properties"
+          # `yes` takes SIGPIPE once sdkmanager exits, so ignore the pipeline status.
+          yes | sdkmanager --licenses > /dev/null || true
           sdkmanager \
             "platform-tools" \
             "platforms;android-33" \
             "build-tools;33.0.1"
+          echo "SDK packages installed under $SDK"
 
       - name: Cache Gradle
         uses: gradle/gradle-build-action@v2
