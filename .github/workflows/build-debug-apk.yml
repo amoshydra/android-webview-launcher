@@ -20,8 +20,20 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      # Replaces android-actions/setup-android@v3, which ends with a hardcoded
+      # `sdkmanager tools` call. The legacy "tools" package was removed from
+      # Google's repository, so that call now exits 1 and fails the step every
+      # time. Installing explicitly mirrors the Dockerfile instead.
+      # build-tools 33.0.1 is the AGP 8.1.0 default; the platform matches compileSdk.
       - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+        run: |
+          echo "${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin" >> "$GITHUB_PATH"
+          echo "ANDROID_HOME=${ANDROID_SDK_ROOT}" >> "$GITHUB_ENV"
+          yes | sdkmanager --licenses > /dev/null
+          sdkmanager \
+            "platform-tools" \
+            "platforms;android-33" \
+            "build-tools;33.0.1"
 
       - name: Cache Gradle
         uses: gradle/gradle-build-action@v2
