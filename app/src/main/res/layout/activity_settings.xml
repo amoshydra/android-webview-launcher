@@ -72,9 +72,28 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:text="@string/edge_to_edge_label"
+        android:textSize="16sp"
+        android:textColor="@color/black"
+        android:layout_marginBottom="8dp" />
+
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/edge_to_edge_switch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/edge_to_edge_hint"
+        android:textSize="13sp"
+        android:textColor="@color/black"
+        android:padding="4dp"
+        android:layout_marginBottom="8dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:text="@string/cache_label"
         android:textSize="16sp"
         android:textColor="@color/black"
+        android:layout_marginTop="16dp"
         android:layout_marginBottom="12dp" />
 
     <RadioGroup

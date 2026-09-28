@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.webkit.HttpCache;
 import androidx.webkit.Profile;
 import androidx.webkit.ProfileStore;
@@ -29,6 +30,7 @@ public class SettingsActivity extends AppCompatActivity {
     private Button queryCacheButton;
     private Button launchButton;
     private RadioGroup cacheRadioGroup;
+    private SwitchCompat edgeToEdgeSwitch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,12 +45,14 @@ public class SettingsActivity extends AppCompatActivity {
         queryCacheButton = findViewById(R.id.query_cache_button);
         launchButton = findViewById(R.id.launch_button);
         cacheRadioGroup = findViewById(R.id.cache_radio_group);
+        edgeToEdgeSwitch = findViewById(R.id.edge_to_edge_switch);
 
         showWebViewInfo();
 
-        // Load saved cache preference
+        // Load saved preferences
         SharedPreferences prefs = getSharedPreferences("WebViewPreferences", MODE_PRIVATE);
         int savedCacheMode = prefs.getInt("cache_mode", WebSettings.LOAD_DEFAULT);
+        edgeToEdgeSwitch.setChecked(prefs.getBoolean("edge_to_edge", false));
         
         switch (savedCacheMode) {
             case WebSettings.LOAD_NO_CACHE:
@@ -89,6 +93,7 @@ public class SettingsActivity extends AppCompatActivity {
             }
             
             editor.putInt("cache_mode", selectedCacheMode);
+            editor.putBoolean("edge_to_edge", edgeToEdgeSwitch.isChecked());
             editor.apply();
 
             measureCache(url);
@@ -97,6 +102,7 @@ public class SettingsActivity extends AppCompatActivity {
             intent.putExtra("url", url);
             intent.putExtra("javascript", javascript);
             intent.putExtra("quota_bytes", getRequestedQuota());
+            intent.putExtra("edge_to_edge", edgeToEdgeSwitch.isChecked());
             startActivity(intent);
         });
     }

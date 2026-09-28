@@ -6,9 +6,12 @@
         <item name="colorAccent">@color/teal_200</item>
     </style>
 
+    <!-- android:windowFullscreen is deliberately absent. Status bar visibility
+         is decided at runtime by MainActivity: hidden for the default fullscreen
+         look, shown and transparent when edge-to-edge is enabled so the page
+         can read a non-zero env(safe-area-inset-top). -->
     <style name="Theme.FullScreen" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowNoTitle">true</item>
-        <item name="android:windowFullscreen">true</item>
         <item name="android:windowContentOverlay">@null</item>
     </style>
 </resources>
