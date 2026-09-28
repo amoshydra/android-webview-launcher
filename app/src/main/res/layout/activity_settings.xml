@@ -88,6 +88,130 @@
         android:layout_marginBottom="8dp" />
 
     <TextView
+        android:id="@+id/inset_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/inset_override_label"
+        android:textSize="16sp"
+        android:textColor="@color/black"
+        android:layout_marginBottom="4dp" />
+
+    <TextView
+        android:id="@+id/inset_hint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/inset_override_hint"
+        android:textSize="13sp"
+        android:textColor="@color/black"
+        android:layout_marginBottom="8dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:baselineAligned="false">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginEnd="6dp">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/inset_top"
+                android:textSize="12sp"
+                android:textColor="@color/black" />
+            <EditText
+                android:id="@+id/inset_top_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/inset_blank_hint"
+                android:inputType="number"
+                android:maxLength="6"
+                android:textSize="14sp"
+                android:padding="8dp"
+                android:background="@android:drawable/edit_text" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="3dp"
+            android:layout_marginEnd="3dp">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/inset_right"
+                android:textSize="12sp"
+                android:textColor="@color/black" />
+            <EditText
+                android:id="@+id/inset_right_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/inset_blank_hint"
+                android:inputType="number"
+                android:maxLength="6"
+                android:textSize="14sp"
+                android:padding="8dp"
+                android:background="@android:drawable/edit_text" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="3dp"
+            android:layout_marginEnd="3dp">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/inset_bottom"
+                android:textSize="12sp"
+                android:textColor="@color/black" />
+            <EditText
+                android:id="@+id/inset_bottom_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/inset_blank_hint"
+                android:inputType="number"
+                android:maxLength="6"
+                android:textSize="14sp"
+                android:padding="8dp"
+                android:background="@android:drawable/edit_text" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="6dp">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/inset_left"
+                android:textSize="12sp"
+                android:textColor="@color/black" />
+            <EditText
+                android:id="@+id/inset_left_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/inset_blank_hint"
+                android:inputType="number"
+                android:maxLength="6"
+                android:textSize="14sp"
+                android:padding="8dp"
+                android:background="@android:drawable/edit_text" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/cache_label"

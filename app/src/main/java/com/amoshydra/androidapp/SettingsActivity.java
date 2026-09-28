@@ -22,6 +22,9 @@ import java.io.File;
 import java.util.Locale;
 
 public class SettingsActivity extends AppCompatActivity {
+    /** Sentinel meaning "no override"; any real value is a non-negative pixel count. */
+    private static final int NO_OVERRIDE = -1;
+
     private EditText urlInput;
     private EditText jsInput;
     private EditText cacheQuotaInput;
@@ -31,6 +34,12 @@ public class SettingsActivity extends AppCompatActivity {
     private Button launchButton;
     private RadioGroup cacheRadioGroup;
     private SwitchCompat edgeToEdgeSwitch;
+    private EditText insetTopInput;
+    private EditText insetRightInput;
+    private EditText insetBottomInput;
+    private EditText insetLeftInput;
+    private TextView insetLabel;
+    private TextView insetHint;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +55,12 @@ public class SettingsActivity extends AppCompatActivity {
         launchButton = findViewById(R.id.launch_button);
         cacheRadioGroup = findViewById(R.id.cache_radio_group);
         edgeToEdgeSwitch = findViewById(R.id.edge_to_edge_switch);
+        insetTopInput = findViewById(R.id.inset_top_input);
+        insetRightInput = findViewById(R.id.inset_right_input);
+        insetBottomInput = findViewById(R.id.inset_bottom_input);
+        insetLeftInput = findViewById(R.id.inset_left_input);
+        insetLabel = findViewById(R.id.inset_label);
+        insetHint = findViewById(R.id.inset_hint);
 
         showWebViewInfo();
 
@@ -53,6 +68,16 @@ public class SettingsActivity extends AppCompatActivity {
         SharedPreferences prefs = getSharedPreferences("WebViewPreferences", MODE_PRIVATE);
         int savedCacheMode = prefs.getInt("cache_mode", WebSettings.LOAD_DEFAULT);
         edgeToEdgeSwitch.setChecked(prefs.getBoolean("edge_to_edge", false));
+
+        restoreInsetPref(prefs, "inset_override_top", insetTopInput);
+        restoreInsetPref(prefs, "inset_override_right", insetRightInput);
+        restoreInsetPref(prefs, "inset_override_bottom", insetBottomInput);
+        restoreInsetPref(prefs, "inset_override_left", insetLeftInput);
+
+        // The override only has any effect while edge-to-edge is on, because otherwise the
+        // framework consumes the insets before the WebView ever sees them.
+        edgeToEdgeSwitch.setOnCheckedChangeListener((v, checked) -> applyInsetInputsEnabled(checked));
+        applyInsetInputsEnabled(edgeToEdgeSwitch.isChecked());
         
         switch (savedCacheMode) {
             case WebSettings.LOAD_NO_CACHE:
@@ -94,6 +119,14 @@ public class SettingsActivity extends AppCompatActivity {
             
             editor.putInt("cache_mode", selectedCacheMode);
             editor.putBoolean("edge_to_edge", edgeToEdgeSwitch.isChecked());
+            int insetTop = readInsetOverride(insetTopInput);
+            int insetRight = readInsetOverride(insetRightInput);
+            int insetBottom = readInsetOverride(insetBottomInput);
+            int insetLeft = readInsetOverride(insetLeftInput);
+            editor.putInt("inset_override_top", insetTop);
+            editor.putInt("inset_override_right", insetRight);
+            editor.putInt("inset_override_bottom", insetBottom);
+            editor.putInt("inset_override_left", insetLeft);
             editor.apply();
 
             measureCache(url);
@@ -103,6 +136,10 @@ public class SettingsActivity extends AppCompatActivity {
             intent.putExtra("javascript", javascript);
             intent.putExtra("quota_bytes", getRequestedQuota());
             intent.putExtra("edge_to_edge", edgeToEdgeSwitch.isChecked());
+            intent.putExtra("inset_top", insetTop);
+            intent.putExtra("inset_right", insetRight);
+            intent.putExtra("inset_bottom", insetBottom);
+            intent.putExtra("inset_left", insetLeft);
             startActivity(intent);
         });
     }
@@ -110,6 +147,40 @@ public class SettingsActivity extends AppCompatActivity {
     private String resolveUrl() {
         String url = urlInput.getText().toString().trim();
         return url.isEmpty() ? "https://example.com" : url;
+    }
+
+    private void restoreInsetPref(SharedPreferences prefs, String key, EditText field) {
+        int value = prefs.getInt(key, NO_OVERRIDE);
+        if (value != NO_OVERRIDE) {
+            field.setText(String.valueOf(value));
+        }
+    }
+
+    /** @return the requested inset in pixels, or {@link #NO_OVERRIDE} to leave it native. */
+    private int readInsetOverride(EditText field) {
+        String text = field.getText().toString().trim();
+        if (text.isEmpty()) {
+            return NO_OVERRIDE;
+        }
+        try {
+            int value = Integer.parseInt(text);
+            return value < 0 ? NO_OVERRIDE : value;
+        } catch (NumberFormatException e) {
+            return NO_OVERRIDE;
+        }
+    }
+
+    private void applyInsetInputsEnabled(boolean edgeToEdgeOn) {
+        float alpha = edgeToEdgeOn ? 1.0f : 0.4f;
+        EditText[] inputs = {insetTopInput, insetRightInput, insetBottomInput, insetLeftInput};
+        for (EditText input : inputs) {
+            input.setEnabled(edgeToEdgeOn);
+            input.setAlpha(alpha);
+        }
+        insetLabel.setEnabled(edgeToEdgeOn);
+        insetLabel.setAlpha(alpha);
+        insetHint.setEnabled(edgeToEdgeOn);
+        insetHint.setAlpha(alpha);
     }
 
     private long getRequestedQuota() {

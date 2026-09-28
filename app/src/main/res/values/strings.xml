@@ -9,6 +9,15 @@
     <string name="launch_button">Launch WebView</string>
     <string name="edge_to_edge_label">Edge-to-Edge Display</string>
     <string name="edge_to_edge_hint">On: the page fills the whole screen and draws behind the system bars. The page handles its own safe-area padding via env(safe-area-inset-*). Needs WebView M136+.</string>
+    <string name="bottom_inset_label">Bottom safe-area inset override</string>
+    <string name="bottom_inset_hint">Leave empty to use the real system inset. Enter 0 to force none. Pixels, not clamped. Needs Android 11+ (API 30).</string>
+    <string name="inset_override_label">Safe-area inset override</string>
+    <string name="inset_override_hint">Forces env(safe-area-inset-*) for the page. Blank uses the real system inset; 0 forces none. Pixels, not clamped. Needs Android 11+ (API 30).</string>
+    <string name="inset_top">Top</string>
+    <string name="inset_right">Right</string>
+    <string name="inset_bottom">Bottom</string>
+    <string name="inset_left">Left</string>
+    <string name="inset_blank_hint">default</string>
     <string name="cache_label">Cache Mode</string>
     <string name="cache_default_desc">Use Default Cache (Use default cache behavior)</string>
     <string name="cache_no_cache_desc">No Cache (Bypass cache, load from network)</string>

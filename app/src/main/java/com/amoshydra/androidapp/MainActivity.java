@@ -21,7 +21,10 @@ import androidx.webkit.WebViewFeature;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
-    private WebView webView;
+    /** Sentinel meaning "leave env(safe-area-inset-bottom) at the real system value". */
+    private static final int NO_INSET_OVERRIDE = -1;
+
+    private InsetAwareWebView webView;
     private String javascriptCode;
 
     @Override
@@ -41,6 +44,14 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         webView = findViewById(R.id.webview);
+
+        // Must be set before the first inset dispatch, so it lands before loadUrl.
+        webView.setInsetOverride(
+                readInsetExtra("inset_top"),
+                readInsetExtra("inset_right"),
+                readInsetExtra("inset_bottom"),
+                readInsetExtra("inset_left"));
+
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setDomStorageEnabled(true);
@@ -119,8 +130,13 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private String formatBytes(long bytes) {
-        if (bytes < 1024) {
+    /** @return the override in pixels, or null to leave that edge at the real system value. */
+    private Integer readInsetExtra(String key) {
+        int value = getIntent().getIntExtra(key, NO_INSET_OVERRIDE);
+        return value == NO_INSET_OVERRIDE ? null : value;
+    }
+
+    private String formatBytes(long bytes) {        if (bytes < 1024) {
             return bytes + " B";
         }
         double kb = bytes / 1024.0;
