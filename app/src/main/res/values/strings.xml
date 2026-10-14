@@ -12,7 +12,7 @@
     <string name="bottom_inset_label">Bottom safe-area inset override</string>
     <string name="bottom_inset_hint">Leave empty to use the real system inset. Enter 0 to force none. Pixels, not clamped. Needs Android 11+ (API 30).</string>
     <string name="inset_override_label">Safe-area inset override</string>
-    <string name="inset_override_hint">Forces env(safe-area-inset-*) for the page. Blank uses the real system inset; 0 forces none. Pixels, not clamped. Needs Android 11+ (API 30).</string>
+    <string name="inset_override_hint">Forces env(safe-area-inset-*) for the page. Blank uses the real system inset; 0 forces none. Pixels, not clamped. Needs Android 12+ (API 31). Android forces the bottom to 0 while the keyboard is open.</string>
     <string name="inset_top">Top</string>
     <string name="inset_right">Right</string>
     <string name="inset_bottom">Bottom</string>

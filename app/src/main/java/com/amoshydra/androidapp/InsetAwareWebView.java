@@ -20,11 +20,27 @@ import android.webkit.WebView;
  *
  * <p>So the only way to influence {@code env(safe-area-inset-*)} natively is to change
  * those insets before they are dispatched to {@code AwContents}. A
- * {@code setOnApplyWindowInsetsListener} cannot do that: the platform listener returns a
- * boolean (consumed or not) and the AndroidX compat wrapper maps {@code != null} onto that
- * boolean, so a rebuilt {@code WindowInsetsCompat} never reaches the WebView. Overriding
- * {@link #onApplyWindowInsets} does work, because {@code ViewGroup.dispatchApplyWindowInsets}
- * passes its return value down to child views and {@code AwContents} is one.
+ * {@code setOnApplyWindowInsetsListener} set on the WebView itself cannot do that: the
+ * listener is called <em>instead of</em> the view's own {@code onApplyWindowInsets}, so it
+ * replaces the handling that feeds {@code AwContents}, and the rebuilt insets go back to the
+ * caller instead of down into the widget.
+ *
+ * <p>A listener set on the WebView's parent does work.
+ * {@code ViewGroup.dispatchApplyWindowInsets} passes the insets returned by the parent's own
+ * dispatch down to each child, and the WebView is one of those children, so the parent
+ * listener's return value is what the child receives. Such a listener must return a rebuilt,
+ * non-consumed {@code WindowInsetsCompat}. Returning {@code WindowInsetsCompat.CONSUMED} is
+ * not equivalent: it zeroes every type including {@code ime()}, and it marks the insets
+ * consumed, so {@code ViewGroup.dispatchApplyWindowInsets} skips its children and the WebView
+ * receives no dispatch at all. Measured on a OnePlus 6T (Android 15, WebView 153) with the
+ * listener installed before the first dispatch: the parent listener ran 3 times and the
+ * WebView's {@code onApplyWindowInsets} ran 0 times, the page read 0 for every inset, and its
+ * visual viewport never shrank when the keyboard opened.
+ *
+ * <p>Overriding {@link #onApplyWindowInsets} in a subclass, which is what this class does, is
+ * the more direct route and is unaffected by all of the above. It works because
+ * {@code ViewGroup.dispatchApplyWindowInsets} passes the override's return value down to child
+ * views and {@code AwContents} is one.
  *
  * <p>Each edge must be set on <em>every</em> type in the mask, not just the type that
  * "owns" it, because {@code getInsets(mask)} returns the per-edge maximum across the mask.
